@@ -4,6 +4,7 @@
 #include <tuple>
 #include <iterator>
 #include <optional>
+#include <iostream>
 
 /**
  * @brief Container used to store assoicate keys with values.
@@ -36,10 +37,12 @@ public:
     {
         for (auto& item : items) {
             if (item.first == key) {
+                std::cout << "[COVERAGE] set: opdaterer eksisterende" << std::endl; 
                 item.second = val; // Overskriv eksisterende værdi
                 return;
             }
         }
+        std::cout << "[COVERAGE] set: tilføjer ny" << std::endl;
         items.push_back({key, val}); // Tilføj ny hvis ikke fundet
     }
 
@@ -87,8 +90,12 @@ public:
     std::optional<V> get(K key) const
     {
         for (const auto& item : items) {
-            if (item.first == key) return item.second;
+            if (item.first == key) {
+                std::cout << "[COVERAGE] get: fandt nøgle" << std::endl;
+                return item.second;
+            }
         }
+        std::cout << "[COVERAGE] get: fandt intet" << std::endl;
         return std::nullopt;
     }
 
@@ -104,10 +111,16 @@ public:
      */
     void del(K key)
     {
+        size_t start_size = items.size();
         items.erase(std::remove_if(items.begin(), items.end(),
             [&key](const std::pair<K, V>& item) {
                 return item.first == key;
             }), items.end());
+
+        if (items.size() < start_size) 
+            std::cout << "[COVERAGE] del: slettede et element" << std::endl;
+        else 
+            std::cout << "[COVERAGE] del: intet at slette" << std::endl;
     }
 
     /**
@@ -143,4 +156,5 @@ public:
         }
         return all_values;
     }
+
 };
