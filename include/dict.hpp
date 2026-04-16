@@ -16,6 +16,11 @@ template <class K, class V>
 class Dict
 {
 
+private:
+    // Vi bruger en vector af pairs til at gemme vores data.
+    // Pair.first er nøglen (K), Pair.second er værdien (V).
+    std::vector<std::pair<K, V>> items;
+
 public:
     /**
      * @brief Associates the key with the specified value.
@@ -23,9 +28,19 @@ public:
      * 
      * @param key key associated with the provided key.
      * @param val value assoicated with the provided key.
+     * @pre none.
+     * @post Hvis nøglen findes i forvejen, overskrives den gamle værdi, hvis ny nøgle, tilføjes et nyt par, og len() stiger med 1.
      */
+    
     void set(K key, V val)
     {
+        for (auto& item : items) {
+            if (item.first == key) {
+                item.second = val; // Overskriv eksisterende værdi
+                return;
+            }
+        }
+        items.push_back({key, val}); // Tilføj ny hvis ikke fundet
     }
 
     /**
@@ -34,9 +49,15 @@ public:
      * @param key key for which to look for.
      * @return true if the key is defined in the dictionary.
      * @return false otherwise.
+     * @pre none
+     * @post Returnerer sandt hvis nøglen eksisterer i items. 
      */
+
     bool has(K key) const
     {
+        for (const auto& item : items) {
+            if (item.first == key) return true;
+        }
         return false;
     }
 
@@ -44,10 +65,13 @@ public:
      * @brief Returns the number of items in the dictionary.
      * 
      * @return the number of items in the dictionary.
+     * @pre none
+     * @post Returnerer det aktuelle antal unikke nøgle-værdi par.
      */
-    size_t len()
+
+    size_t len() const
     {
-        return 0;
+        return items.size();
     }
 
     /**
@@ -56,10 +80,16 @@ public:
      * 
      * @param key key for which to locate value.
      * @return value associated with key.
+     * @pre none
+     * @post Hvis nøglen findes, returneres værdien i std::optional. Hvis ikke, returneres std::nullopt.
      */
+
     std::optional<V> get(K key) const
     {
-        return {};
+        for (const auto& item : items) {
+            if (item.first == key) return item.second;
+        }
+        return std::nullopt;
     }
 
     /**
@@ -69,28 +99,48 @@ public:
      * 
      * @param key A key currently present in the dictionary
      * which will be deleted.
+     * @pre none.
+     * @post Hvis nøglen fandtes, fjernes den fra ordbogen og len() falder med 1. Hvis nøglen ikke findes, ingenting sker.
      */
     void del(K key)
     {
+        items.erase(std::remove_if(items.begin(), items.end(),
+            [&key](const std::pair<K, V>& item) {
+                return item.first == key;
+            }), items.end());
     }
 
     /**
      * @brief List all keys of the dictionary.
      * 
      * @return vector of keys.
+     * @pre none.
+     * @post Returnerer en vektor med alle gemte nøgler, hvor rækkefølgen ikke er garanteret.
+     * 
      */
-    std::vector<K> keys()
+    std::vector<K> keys() const
     {
-        return {};
+        std::vector<K> all_keys;
+        for (const auto& item : items) {
+            all_keys.push_back(item.first);
+        }
+        return all_keys;
     }
 
     /**
      * @brief List all values of the dictionary.
      * 
      * @return vector of values.
+     * @pre none.
+     * @post Returnerer en vektor med alle gemte værdier.
      */
-    std::vector<V> values()
+
+    std::vector<V> values() const
     {
-        return {};
+        std::vector<V> all_values;
+        for (const auto& item : items) {
+            all_values.push_back(item.second);
+        }
+        return all_values;
     }
 };
