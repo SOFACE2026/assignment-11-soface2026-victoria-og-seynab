@@ -7,14 +7,20 @@
 
 /**
  * @brief Container used to store assoicate keys with values.
- * values can later be retrived using the corresponding key.
+ * values can later be retrieved using the corresponding key.
  * 
  * @tparam K type of the keys stored in the dictionary.
  * @tparam V type of the values assoicated with each key.
  */
+
+
 template <class K, class V>
 class Dict
 {
+
+private:
+    std::vector<K> keys_;
+    std::vector<V> values_;
 
 public:
     /**
@@ -26,6 +32,20 @@ public:
      */
     void set(K key, V val)
     {
+        // We are going through all elements in the keys_ vector to check if the provided key is present in the dictionary.
+        for(size_t i = 0; i < keys_.size(); i++)
+        {
+            if(keys_[i] == key)
+            {
+                values_[i] = val; // If the key is found in the dictionary we overwrite its value with the provided value.
+                return;
+            }
+        }
+        // If the key is not found in the dictionary we add it to the end of the keys_ vector 
+        // and add its value to the end of the values_ vector.
+        keys_.push_back(key);
+        values_.push_back(val);
+
     }
 
     /**
@@ -37,7 +57,15 @@ public:
      */
     bool has(K key) const
     {
-        return false;
+        // We are going through all elemnts in the keys_ vector to check if the provided key is present in the dictionary.
+        for(size_t i = 0; i < keys_.size(); i++)
+        {
+            if(keys_[i] == key)
+            {
+                return true; // If the key is found in the dictionary we return true.
+            }
+        }
+        return false; // If the key is not found in the dictionary we return false.
     }
 
     /**
@@ -47,7 +75,7 @@ public:
      */
     size_t len()
     {
-        return 0;
+        return keys_.size(); // The number of items in the dict is returned
     }
 
     /**
@@ -59,7 +87,13 @@ public:
      */
     std::optional<V> get(K key) const
     {
-        return {};
+        for(size_t i = 0; i < keys_.size(); i++){
+            if(keys_[i] == key)
+            {
+                return values_[i]; // If the key is found in the dictionary we return its value.
+            }
+        }
+        return std::nullopt; // If the key is not found in the dictionary we return std::nullopt (nothing)
     }
 
     /**
@@ -72,6 +106,17 @@ public:
      */
     void del(K key)
     {
+        for(size_t i = 0; i < keys_.size(); i++){
+            if(keys_[i] == key){
+                // Delete the key and its associated value from the dictionary by erasing them from the keys_ and values_ vectors.
+                keys_.erase(keys_.begin() + i);
+                values_.erase(values_.begin() + i);
+
+                return; // After deleting the key and its associated value we return from the function.
+            }
+        }
+
+        // If the key is not found in the dictionary we do nothing and return from the function.
     }
 
     /**
@@ -81,7 +126,7 @@ public:
      */
     std::vector<K> keys()
     {
-        return {};
+        return keys_; // Return the keys_ vector, containing all keys
     }
 
     /**
@@ -91,6 +136,6 @@ public:
      */
     std::vector<V> values()
     {
-        return {};
+        return values_; // Return the values_ vector, containing all values
     }
 };
